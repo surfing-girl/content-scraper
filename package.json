@@ -9,6 +9,8 @@
   "author": "Joanna Demecka",
   "license": "MIT",
   "dependencies": {
+    "cheerio": "^0.22.0",
+    "json2csv": "^3.7.3",
     "osmosis": "^1.1.4"
   }
 }
