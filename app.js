@@ -7,7 +7,7 @@ function ContentScraper() {
   this.url = 'http://www.shirts4mike.com/';
   this.savedData = [];
   this.currentDate = new Date();
-  this.scrapeDate = `${this.currentDate.getFullYear()}-${this.currentDate.getMonth()+1}-${this.currentDate.getDate()}-${this.currentDate.getSeconds()}`;
+  this.scrapeDate = `${this.currentDate.getFullYear()}-${this.currentDate.getMonth()+1}-${this.currentDate.getDate()}`;
   this.csvFields = ['Title', 'Color', 'Price', 'ImageURL', 'URL', 'Time'];
 }
 
@@ -44,7 +44,8 @@ ContentScraper.prototype.getShirtsLinks = function () {
     .set({'shirtLink': ['a@href']})
     .data((data) => {
       this.allShirtsLinks = data;
-    }).then(() => {this.visitLinks()});
+    }).then(() => {this.visitLinks()})
+    .error(console.log);
 }
 
 ContentScraper.prototype.visitLinks = function () {
