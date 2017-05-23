@@ -39,13 +39,22 @@ ContentScraper.prototype.createCSVFile = function (data, fields) {
 };
 
 ContentScraper.prototype.getShirtsLinks = function () {
-  osmosis.get('http://www.shirts4mike.com/shirts.php')
-    .find('.products')
-    .set({'shirtLink': ['a@href']})
-    .data((data) => {
-      this.allShirtsLinks = data;
-    }).then(() => {this.visitLinks()})
-    .error(console.log);
+  try {
+    osmosis.get('http://www.shirts4mike.com/shirts.php')
+      .find('.products')
+      .set({'shirtLink': ['a@href']})
+      .data((data) => {
+        this.allShirtsLinks = data;
+      }).then(() => {this.visitLinks()})
+      .error((msg) => {
+          if (msg.indexOf('404') > -1) {
+              console.error('Your page was not found');
+          }
+        }
+      );
+  } catch (e) {
+    console.error(e);
+  }
 }
 
 ContentScraper.prototype.visitLinks = function () {
@@ -69,7 +78,13 @@ ContentScraper.prototype.visitLinks = function () {
         if(this.allShirtsLinks.shirtLink.length <= this.savedData.length) {
           this.createCSVFile(this.savedData, this.csvFields);
         }
-      });
+      })
+      .error((msg) => {
+          if (msg.indexOf('404') > -1) {
+              console.error(`Your page: '${this.url + this.allShirtsLinks.shirtLink[i]}' was not found`);
+          }
+        }
+      );
   }
 }
 
