@@ -11,6 +11,16 @@ function ContentScraper() {
   this.csvFields = ['Title', 'Color', 'Price', 'ImageURL', 'URL', 'Time'];
 }
 
+ContentScraper.prototype.printError = function (msg, url) {
+  if (msg.indexOf('404') > -1) {
+      console.error(`Your page: '${url}' was not found`);
+  } else if (msg.indexOf('getaddrinfo') > -1) {
+      console.error('You are offline!');
+  } else {
+    console.error(msg);
+  }
+};
+
 ContentScraper.prototype.createDataDirectory = function () {
   fs.stat("./data", function (err, stats){
     if (err) {
@@ -20,11 +30,9 @@ ContentScraper.prototype.createDataDirectory = function () {
     }
     if (!stats.isDirectory()) {
       // This isn't a directory!
-      console.log('helllooo');
-      //callback(new Error('temp is not a directory!'));
+      console.log("This isn't a directory!");
     } else {
-      console.log('Does exist');
-      //callback();
+      console.log('Directory "data" does exist!');
     }
   });
 }
@@ -38,23 +46,17 @@ ContentScraper.prototype.createCSVFile = function (data, fields) {
   });
 };
 
-ContentScraper.prototype.getShirtsLinks = function () {
-  try {
-    osmosis.get('http://www.shirts4mike.com/shirts.php')
-      .find('.products')
-      .set({'shirtLink': ['a@href']})
-      .data((data) => {
-        this.allShirtsLinks = data;
-      }).then(() => {this.visitLinks()})
-      .error((msg) => {
-          if (msg.indexOf('404') > -1) {
-              console.error('Your page was not found');
-          }
-        }
-      );
-  } catch (e) {
-    console.error(e);
-  }
+ContentScraper.prototype.getShirtsLinks = function (url) {
+  osmosis.get(url)
+    .find('.products')
+    .set({'shirtLink': ['a@href']})
+    .data((data) => {
+      this.allShirtsLinks = data;
+    }).then(() => {this.visitLinks()})
+    .error((msg) => {
+        this.printError(msg, url);
+      }
+    );
 }
 
 ContentScraper.prototype.visitLinks = function () {
@@ -90,4 +92,4 @@ ContentScraper.prototype.visitLinks = function () {
 
 const contentScraper = new ContentScraper();
 contentScraper.createDataDirectory();
-contentScraper.getShirtsLinks();
+contentScraper.getShirtsLinks('http://www.shirts4mike.com/shirts.php');
