@@ -1,12 +1,18 @@
 const osmosis = require('osmosis');
 const http = require('http');
 
+/**
+* Scraper construction function for getting data
+* @constructor
+* @param output
+*/
 function Scraper(output) {
   this.url = 'http://www.shirts4mike.com/';
   this.savedData = [];
   this.output = output;
 }
 
+/**Function scrapes the page and gets all links of shirts */
 Scraper.prototype.getShirtsLinks = function (url) {
   osmosis.get(url)
     .find('.products')
@@ -20,6 +26,7 @@ Scraper.prototype.getShirtsLinks = function (url) {
     );
 }
 
+/** Function follows each link and extracts data */
 Scraper.prototype.visitLinks = function () {
   for(let i=0; i<this.allShirtsLinks.shirtLink.length; i++) {
     osmosis.get(this.url + this.allShirtsLinks.shirtLink[i])
